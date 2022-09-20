@@ -17,8 +17,8 @@ app.get("/", (req, res, next) => {
 })
 
 app.get('/api/:ano/ipca/', (req, res, next) => {
-    const query = 'SELECT indices FROM ipca'
-    let params = []
+    const query = 'SELECT indices FROM ipca WHERE ano = ?'
+    let params = [req.params.ano]
 
     db.all(query, params, (err, rows) => {
         if (err) {
@@ -40,8 +40,8 @@ app.get('/api/:ano/ipca/', (req, res, next) => {
 })
 
 app.get('/api/:ano/inpc/', (req, res, next) => {
-    const query = 'SELECT indices FROM inpc'
-    let params = []
+    const query = 'SELECT indices FROM inpc WHERE ano = ?'
+    let params = [req.params.ano]
 
     db.all(query, params, (err, rows) => {
         if (err) {
