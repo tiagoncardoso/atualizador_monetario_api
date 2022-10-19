@@ -167,6 +167,29 @@ app.get('/api/available/inpc', (req, res, next) => {
     })
 })
 
+app.get('/api/estado', (req, res, next) => {
+    const query = 'SELECT * FROM estado'
+    let params = []
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+            return
+        }
+
+        let result = []
+
+        // rows.forEach((row) => {
+        //     result.push(row)
+        // })
+
+        res.json({
+            message: 'success',
+            estados: rows
+        })
+    })
+})
+
 
 // Default reponse for any other request
 app.use((req, res) => {
