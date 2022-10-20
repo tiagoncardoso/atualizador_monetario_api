@@ -177,15 +177,26 @@ app.get('/api/estado', (req, res, next) => {
             return
         }
 
-        let result = []
-
-        // rows.forEach((row) => {
-        //     result.push(row)
-        // })
-
         res.json({
             message: 'success',
             estados: rows
+        })
+    })
+})
+
+app.get('/api/:estadoId/cidades', (req, res, next) => {
+    const query = 'SELECT * FROM cidade WHERE estado_id = ?'
+    let params = [req.params.estadoId]
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+            return
+        }
+
+        res.json({
+            message: 'success',
+            cidades: rows
         })
     })
 })

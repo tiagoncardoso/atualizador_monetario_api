@@ -81,6 +81,20 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 // Table already created
             }
         })
+
+        db.run(`
+        CREATE TABLE IF NOT EXISTS cidade (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            estado_id INTEGER NOT NULL,
+            nome VARCHAR(200) NOT NULL,
+            CONSTRAINT cidade_FK FOREIGN KEY (estado_id) REFERENCES estado(id)
+        )`,
+        
+        (err) => {
+            if (err) {
+                // Table already created
+            }
+        })
     }
 })
 

@@ -230,3 +230,73 @@ Exemplo de resposta:
     ]
 }
 ```
+
+> **[GET] /api/estado
+
+Retorna todos os estados do Brasil.
+
+Exemplo de resposta:
+
+```json
+{
+    "message": "success",
+    "estados": [
+        {
+            "id": 1,
+            "name": "Rondônia",
+            "uf": "RO"
+        },
+        {
+            "id": 2,
+            "name": "Acre",
+            "uf": "AC"
+        },
+        {
+            "id": 3,
+            "name": "Amazonas",
+            "uf": "AM"
+        },
+        {
+            "id": 4,
+            "name": "Roraima",
+            "uf": "RR"
+        },
+        ...
+    ]
+}
+```
+
+> **[GET] /api/:estado_id/cidades
+
+Retorna todas as cidades de um estado específico do Brasil.
+
+Exemplo de resposta:
+
+```json
+{
+    "message": "success",
+    "estados": [
+        {
+            "id": 1,
+            "estado_id": 1,
+            "nome": "Alta Floresta d Oeste"
+        },
+        {
+            "id": 2,
+            "estado_id": 1,
+            "nome": "Ariquemes"
+        },
+        {
+            "id": 3,
+            "estado_id": 1,
+            "nome": "Cabixi"
+        },
+        {
+            "id": 4,
+            "estado_id": 1,
+            "nome": "Cacoal"
+        },
+        ...,
+    ]
+}
+```
