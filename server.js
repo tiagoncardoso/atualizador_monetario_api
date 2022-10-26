@@ -1,10 +1,13 @@
 // Create express app
 const express = require("express")
+const bp = require('body-parser')
 const cors = require('cors')
 const app = express()
 const db = require('./database')
 
 app.use(cors())
+app.use(bp.json())
+app.use(bp.urlencoded({ extended: true }))
 
 // Server port
 const HTTP_PORT = 8000
@@ -199,6 +202,50 @@ app.get('/api/:estadoId/cidades', (req, res, next) => {
             cidades: rows
         })
     })
+})
+
+app.post('/api/usuario', (req, res) => {
+    const usuario = req.body.usuario
+    const contato = req.body.contato
+    const pessoa = req.body.pessoa
+    let usuarioId
+    let contatoId
+    let pessoaId
+
+    let usuarioParams = Object.values(usuario)
+    usuarioParams.push('INATIVO')
+
+    db.run(`INSERT INTO usuario
+        (usuario, senha, status)
+        VALUES
+        (?, ?, ?)`, usuarioParams, function(err) {
+            usuarioId = this.lastID
+        })
+    
+    let contatoParams = Object.values(contato)
+    db.run(`INSERT INTO contato
+        (logradouro, numero, complemento, bairro, cep, uf, cidade, telefone, email)
+        VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)`, contatoParams, function(err) {
+            contatoId = this.lastID
+        })
+
+    setTimeout(() => {
+        let pessoaParams = Object.values(pessoa)
+        pessoaParams.push(contatoId, usuarioId)
+        console.log(pessoaParams)
+        db.run(`INSERT INTO pessoa
+            (nome, email, email2, nascimento, genero, cpf, rg, uf_rg, contato, usuario)
+            VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, pessoaParams, function(err) {
+                pessoaId = this.lastID
+            })
+
+        res.json({
+            message: 'Novo cadastro realizado com sucesso',
+            error: false
+        })
+    }, 1000)
 })
 
 

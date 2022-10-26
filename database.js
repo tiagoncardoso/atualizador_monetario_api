@@ -95,6 +95,66 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 // Table already created
             }
         })
+
+        db.run(`
+        CREATE TABLE IF NOT EXISTS usuario (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuario VARCHAR(40) NOT NULL,
+            senha VARCHAR(150) NOT NULL,
+            status VARCHAR(15) NOT NULL
+        )`,
+        
+        (err) => {
+            if (err) {
+                // Table already created
+            }
+        })
+
+        db.run(`
+        CREATE TABLE IF NOT EXISTS contato (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            logradouro VARCHAR(150) NOT NULL,
+            numero VARCHAR(15) NOT NULL,
+            complemento VARCHAR(200),
+            bairro VARCHAR(120) NOT NULL,
+            cep VARCHAR(9) NOT NULL,
+            uf INTEGER NOT NULL,
+            cidade INTEGER NOT NULL,
+            telefone VARCHAR NOT NULL,
+            email VARCHAR,
+            CONSTRAINT contato_FK FOREIGN KEY (uf) REFERENCES estado(id),
+            CONSTRAINT contato_FK_1 FOREIGN KEY (cidade) REFERENCES cidade(id)
+        )`,
+        
+        (err) => {
+            if (err) {
+                // Table already created
+            }
+        })
+
+        db.run(`
+        CREATE TABLE IF NOT EXISTS pessoa (
+            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+            nome VARCHAR(250) NOT NULL,
+            email VARCHAR(60) NOT NULL,
+            email2 VARCHAR(60),
+            nascimento DATE NOT NULL,
+            genero VARCHAR(30) NOT NULL,
+            cpf VARCHAR(14) NOT NULL,
+            rg VARCHAR(30) NOT NULL,
+            uf_rg INTEGER NOT NULL,
+            contato INTEGER NOT NULL,
+            usuario INTEGER NOT NULL,
+            CONSTRAINT pessoa_FK FOREIGN KEY (uf_rg) REFERENCES estado(id),
+            CONSTRAINT pessoa_FK_1 FOREIGN KEY (contato) REFERENCES contato(id),
+            CONSTRAINT pessoa_FK_2 FOREIGN KEY (usuario) REFERENCES usuario(id)
+        )`,
+        
+        (err) => {
+            if (err) {
+                // Table already created
+            }
+        })
     }
 })
 
