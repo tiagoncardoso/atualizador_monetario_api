@@ -121,7 +121,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             uf INTEGER NOT NULL,
             cidade INTEGER NOT NULL,
             telefone VARCHAR NOT NULL,
-            email VARCHAR,
+            email VARCHAR(60) NOT NULL,
+            email2 VARCHAR(60),
             CONSTRAINT contato_FK FOREIGN KEY (uf) REFERENCES estado(id),
             CONSTRAINT contato_FK_1 FOREIGN KEY (cidade) REFERENCES cidade(id)
         )`,
@@ -136,8 +137,6 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         CREATE TABLE IF NOT EXISTS pessoa (
             id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
             nome VARCHAR(250) NOT NULL,
-            email VARCHAR(60) NOT NULL,
-            email2 VARCHAR(60),
             nascimento DATE NOT NULL,
             genero VARCHAR(30) NOT NULL,
             cpf VARCHAR(14) NOT NULL,

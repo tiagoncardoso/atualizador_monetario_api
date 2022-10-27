@@ -224,9 +224,9 @@ app.post('/api/usuario', (req, res) => {
     
     let contatoParams = Object.values(contato)
     db.run(`INSERT INTO contato
-        (logradouro, numero, complemento, bairro, cep, uf, cidade, telefone, email)
+        (logradouro, numero, complemento, bairro, cep, uf, cidade, telefone, email, email2)
         VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?)`, contatoParams, function(err) {
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, contatoParams, function(err) {
             contatoId = this.lastID
         })
 
@@ -235,9 +235,9 @@ app.post('/api/usuario', (req, res) => {
         pessoaParams.push(contatoId, usuarioId)
         console.log(pessoaParams)
         db.run(`INSERT INTO pessoa
-            (nome, email, email2, nascimento, genero, cpf, rg, uf_rg, contato, usuario)
+            (nome, nascimento, genero, cpf, rg, uf_rg, contato, usuario)
             VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, pessoaParams, function(err) {
+            (?, ?, ?, ?, ?, ?, ?, ?)`, pessoaParams, function(err) {
                 pessoaId = this.lastID
             })
 
@@ -246,6 +246,24 @@ app.post('/api/usuario', (req, res) => {
             error: false
         })
     }, 1000)
+})
+
+app.get('/api/usuario', (req, res, next) => {
+
+    db.all(`SELECT * FROM pessoa pe
+        INNER JOIN contato co ON pe.contato = co.id
+        INNER JOIN usuario us ON pe.usuario = us.id
+        `, [], (err, rows) => {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+    
+            res.json({
+                message: 'success',
+                usuarios: rows
+            })
+        })
 })
 
 
