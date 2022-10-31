@@ -250,9 +250,31 @@ app.post('/api/usuario', (req, res) => {
 
 app.get('/api/usuario', (req, res, next) => {
 
-    db.all(`SELECT * FROM pessoa pe
+    db.all(`SELECT 
+        pe.id,
+        pe.nome,
+        pe.nascimento,
+        pe.genero,
+        pe.cpf,
+        pe.rg,
+        est_con.uf AS 'uf_rg',
+        co.logradouro,
+        co.numero,
+        co.complemento,
+        co.bairro,
+        co.cep,
+        est_con.uf,
+        cid_con.nome AS 'cidade',
+        co.telefone,
+        co.email,
+        co.email2,
+        us.*
+    FROM pessoa pe
         INNER JOIN contato co ON pe.contato = co.id
         INNER JOIN usuario us ON pe.usuario = us.id
+        INNER JOIN estado est_rg ON pe.uf_rg = est_rg.id
+        INNER JOIN estado est_con ON co.uf = est_con.id
+        INNER JOIN cidade cid_con ON co.cidade = cid_con.id
         `, [], (err, rows) => {
             if (err) {
                 res.status(400).json({ error: err.message })
@@ -262,6 +284,48 @@ app.get('/api/usuario', (req, res, next) => {
             res.json({
                 message: 'success',
                 usuarios: rows
+            })
+        })
+})
+
+app.get('/api/:usuarioId/usuario', (req, res, next) => {
+    const query = `SELECT 
+    pe.nome,
+    pe.nascimento,
+    pe.genero,
+    pe.cpf,
+    pe.rg,
+    est_con.uf AS 'uf_rg',
+    co.logradouro,
+    co.numero,
+    co.complemento,
+    co.bairro,
+    co.cep,
+    est_con.uf,
+    cid_con.nome AS 'cidade',
+    co.telefone,
+    co.email,
+    co.email2,
+    us.*
+FROM pessoa pe
+    INNER JOIN contato co ON pe.contato = co.id
+    INNER JOIN usuario us ON pe.usuario = us.id
+    INNER JOIN estado est_rg ON pe.uf_rg = est_rg.id
+    INNER JOIN estado est_con ON co.uf = est_con.id
+    INNER JOIN cidade cid_con ON co.cidade = cid_con.id
+    WHERE us.id = ?
+    `
+    const params = [req.params.usuarioId]
+
+    db.all(query, params, (err, rows) => {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+    
+            res.json({
+                message: 'success',
+                usuario: rows[0] ?? []
             })
         })
 })
