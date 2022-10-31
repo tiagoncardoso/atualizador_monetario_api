@@ -251,7 +251,7 @@ app.post('/api/usuario', (req, res) => {
 app.get('/api/usuario', (req, res, next) => {
 
     db.all(`SELECT 
-        pe.id,
+        us.id,
         pe.nome,
         pe.nascimento,
         pe.genero,
@@ -268,7 +268,9 @@ app.get('/api/usuario', (req, res, next) => {
         co.telefone,
         co.email,
         co.email2,
-        us.*
+        us.usuario,
+        us.senha,
+        us.status
     FROM pessoa pe
         INNER JOIN contato co ON pe.contato = co.id
         INNER JOIN usuario us ON pe.usuario = us.id
