@@ -430,7 +430,7 @@ app.put('/api/status/usuario/:pessoaId', (req, res) => {
 })
 
 app.put('/api/password/usuario/:pessoaId', (req, res) => {
-    const password = req.body.password
+    const password = req.body.senha
     let usuarioId
 
     db.all(`SELECT pe.id, pe.contato, pe.usuario FROM pessoa pe WHERE pe.id = ?`, [req.params.pessoaId], (err, rows) => {
