@@ -292,6 +292,7 @@ app.get('/api/usuario', (req, res, next) => {
 
 app.get('/api/:usuarioId/usuario', (req, res, next) => {
     const query = `SELECT 
+    pe.id,
     pe.nome,
     pe.nascimento,
     pe.genero,
@@ -308,7 +309,9 @@ app.get('/api/:usuarioId/usuario', (req, res, next) => {
     co.telefone,
     co.email,
     co.email2,
-    us.*
+    us.usuario,
+    us.senha,
+    us.status
 FROM pessoa pe
     INNER JOIN contato co ON pe.contato = co.id
     INNER JOIN usuario us ON pe.usuario = us.id
@@ -332,6 +335,175 @@ FROM pessoa pe
         })
 })
 
+app.put('/api/usuario/:pessoaId', (req, res) => {
+    const usuario = req.body.usuario
+    const contato = req.body.contato
+    const pessoa = req.body.pessoa
+    let usuarioId
+    let contatoId
+    let pessoaId
+
+    db.all(`SELECT pe.id, pe.contato, pe.usuario FROM pessoa pe WHERE pe.id = ?`, [req.params.pessoaId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+            return
+        }
+
+        pessoaId = rows[0].id
+        contatoId = rows[0].contato
+        usuarioId = rows[0].usuario
+    })
+
+    setTimeout(() => {
+        let usuarioParams = Object.values(usuario)
+
+        db.run(`UPDATE usuario SET usuario = ? WHERE id = ?`, [...usuarioParams, usuarioId], function(err) {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+        })
+
+        let contatoParams = Object.values(contato)
+
+        db.run(`UPDATE contato SET
+            logradouro = ?, numero = ?, complemento = ?, bairro = ?, cep = ?, uf = ?, cidade = ?, telefone = ?, email = ?, email2 = ?
+            WHERE id = ?`, [...contatoParams, contatoId], function(err) {
+                if (err) {
+                    res.status(400).json({ error: err.message })
+                    return
+                }
+            })
+
+
+        let pessoaParams = Object.values(pessoa)
+        
+        db.run(`UPDATE pessoa SET
+            nome = ?, nascimento = ?, genero = ?, cpf = ?, rg = ?, uf_rg = ?
+            WHERE id = ?`, [...pessoaParams, pessoaId], function(err) {
+                if (err) {
+                    res.status(400).json({ error: err.message })
+                    return
+                }
+
+                res.json({
+                    status: 'success',
+                    message: 'Os dados foram atualizados com sucesso.'
+                })
+            })
+        }, 1000)
+})
+
+app.put('/api/status/usuario/:pessoaId', (req, res) => {
+    const status = req.body.status
+    let usuarioId
+
+    if (!['ATIVO', 'INATIVO', 'BLOQUEADO'].includes(status)) {
+        res.status(400).json({ error: true, message: 'Status inválido. Status aceitos: [ATIVO, INATIVO, BLOQUEADO]' })
+        return
+    }
+
+    db.all(`SELECT pe.id, pe.contato, pe.usuario FROM pessoa pe WHERE pe.id = ?`, [req.params.pessoaId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+            return
+        }
+
+        usuarioId = rows[0].usuario
+    })
+
+    setTimeout(() => {
+        let statusParams = status
+
+        db.run(`UPDATE usuario SET status = ? WHERE id = ?`, [statusParams, usuarioId], function(err) {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+
+            res.json({
+                status: 'success',
+                message: 'Status atualizado com sucesso.'
+            })
+        })
+    }, 1000)
+})
+
+app.put('/api/password/usuario/:pessoaId', (req, res) => {
+    const password = req.body.password
+    let usuarioId
+
+    db.all(`SELECT pe.id, pe.contato, pe.usuario FROM pessoa pe WHERE pe.id = ?`, [req.params.pessoaId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+            return
+        }
+
+        usuarioId = rows[0].usuario
+    })
+
+    setTimeout(() => {
+        let passwordParams = password
+
+        db.run(`UPDATE usuario SET senha = ? WHERE id = ?`, [passwordParams, usuarioId], function(err) {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+
+            res.json({
+                status: 'success',
+                message: 'Senha atualizada com sucesso.'
+            })
+        })
+    }, 1000)
+})
+
+app.delete('/api/usuario/:pessoaId', (req, res) => {
+    const status = req.body.status
+    let usuarioId
+    let contatoId
+    let pessoaId
+
+    db.all(`SELECT pe.id, pe.contato, pe.usuario FROM pessoa pe WHERE pe.id = ?`, [req.params.pessoaId], (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+            return
+        }
+
+        pessoaId = rows[0].id
+        contatoId = rows[0].contato
+        usuarioId = rows[0].usuario
+    })
+
+    setTimeout(() => {
+        db.run(`DELETE FROM pessoa WHERE id = ?`, [pessoaId], function(err) {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+        })
+
+        db.run(`DELETE FROM usuario WHERE id = ?`, [usuarioId], function(err) {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+        })
+
+        db.run(`DELETE FROM contato WHERE id = ?`, [contatoId], function(err) {
+            if (err) {
+                res.status(400).json({ error: err.message })
+                return
+            }
+
+            res.json({
+                status: 'success',
+                message: 'Usuário removido com sucesso.'
+            })
+        })
+    }, 1000)
+})
 
 // Default reponse for any other request
 app.use((req, res) => {
