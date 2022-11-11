@@ -75,12 +75,10 @@ app.get("/api/ipca/:anoInicial/:anoFinal", (req, res, next) => {
   let params = [req.params.anoInicial, req.params.anoFinal];
 
   if (req.params.anoInicial > req.params.anoFinal) {
-    res
-      .status(400)
-      .json({
-        error:
-          "Para esta consulta é necessário que o ano inicial seja anterior ao ano final.",
-      });
+    res.status(400).json({
+      error:
+        "Para esta consulta é necessário que o ano inicial seja anterior ao ano final.",
+    });
     return;
   }
 
@@ -108,12 +106,10 @@ app.get("/api/inpc/:anoInicial/:anoFinal/", (req, res, next) => {
   let params = [req.params.anoInicial, req.params.anoFinal];
 
   if (req.params.anoInicial > req.params.anoFinal) {
-    res
-      .status(400)
-      .json({
-        error:
-          "Para esta consulta é necessário que o ano inicial seja anterior ao ano final.",
-      });
+    res.status(400).json({
+      error:
+        "Para esta consulta é necessário que o ano inicial seja anterior ao ano final.",
+    });
     return;
   }
 
@@ -317,7 +313,7 @@ app.get("/api/usuario", (req, res, next) => {
   );
 });
 
-app.get("/api/:usuarioId/usuario", (req, res, next) => {
+app.get("/api/:pessoaId/usuario", (req, res, next) => {
   const query = `SELECT 
     pe.id,
     pe.nome,
@@ -345,9 +341,9 @@ FROM pessoa pe
     INNER JOIN estado est_rg ON pe.uf_rg = est_rg.id
     INNER JOIN estado est_con ON co.uf = est_con.id
     INNER JOIN cidade cid_con ON co.cidade = cid_con.id
-    WHERE us.id = ?
+    WHERE pe.id = ?
     `;
-  const params = [req.params.usuarioId];
+  const params = [req.params.pessoaId];
 
   db.all(query, params, (err, rows) => {
     if (err) {
@@ -441,12 +437,10 @@ app.put("/api/status/usuario/:pessoaId", (req, res) => {
   let usuarioId;
 
   if (!["ATIVO", "INATIVO", "BLOQUEADO"].includes(status)) {
-    res
-      .status(400)
-      .json({
-        error: true,
-        message: "Status inválido. Status aceitos: [ATIVO, INATIVO, BLOQUEADO]",
-      });
+    res.status(400).json({
+      error: true,
+      message: "Status inválido. Status aceitos: [ATIVO, INATIVO, BLOQUEADO]",
+    });
     return;
   }
 
